@@ -6,25 +6,48 @@
 #include<cmath>
 #include<vector>
 
+#include<string>
+#include<fstream> // for std::ifstream
 
 typedef struct{
 	float x, y;
 } vector2;
 
+
+//func for genarating unqiue filename
+std::string generateUnqiueFilename(const std::string& baseName, const std::string& extension){
+	int counter = 1;
+	//defines how filename string would be (name + counter + extension (png, jpg, etc))
+	std::string filename = baseName + std::to_string(counter) + extension;
+
+	//check if file already exists
+	while(std::ifstream(filename)){
+		counter++;
+		filename = baseName + std::to_string(counter) + extension; //update filename
+	}
+
+	return filename;
+}
+
+
 //TODO: random number Gen for gradients, to differ noise
 vector2 randomGradient(int ix, int iy){
+
 	//no precomputed gradient means this works for any number of grid coords
 	const unsigned w = 8 * sizeof(unsigned);
 	const unsigned s = w / 2;
 	unsigned a = ix, b = iy;
-//	a *= 3284157443;
-	a *= 2148437123;
+	a *= 3284157443;
+	//a *= randomNumGen();
 
 	b ^= a << s | a >> w - s;
 	b *= 1911520717;
+	//b *= randomNumGen();
 
 	a ^= b << s | b >> w - s;
 	a *= 2048419325;
+	//a *= randomNumGen();
+
 	float random = a * (3.14159265 / ~(~0u >> 1)); //in [0, 2*Pi]
 	
 	// Create the vector from the angle 
@@ -143,10 +166,14 @@ int main() {
 		}
 	}
 
+	//generating unique filename
+	//TODO: arguments for different names and extensions
+	std::string filename = generateUnqiueFilename("perlin_noise", ".png");
+
 	//using stb to generate image out of pixels
-	stbi_write_png("perlin_noise.png", windowWidth, windowHeight, 4, pixels.data(), windowWidth * 4);
+	stbi_write_png(filename.c_str(), windowWidth, windowHeight, 4, pixels.data(), windowWidth * 4);
+	
 
-
-	return 0;
+	return 0; 
 
 }
