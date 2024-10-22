@@ -5,6 +5,8 @@
 #include<iostream>
 #include<cmath>
 #include<vector>
+#include<cstdlib>
+#include<ctime>
 
 #include<string>
 #include<fstream> // for std::ifstream
@@ -12,6 +14,25 @@
 typedef struct{
 	float x, y;
 } vector2;
+
+static bool isPrime(unsigned n) {
+    if (n <= 1) return false;
+    if (n <= 3) return true;
+    if (n % 2 == 0 || n % 3 == 0) return false;
+    for (unsigned i = 5; i * i <= n; i += 6) {
+        if (n % i == 0 || n % (i + 2) == 0) return false;
+    }
+    return true;
+}
+
+// Function to generate a random prime in a given range
+unsigned generateRandomPrime(unsigned min, unsigned max) {
+    unsigned candidate;
+    do {
+        candidate = min + rand() % (max - min);
+    } while (!isPrime(candidate));
+    return candidate;
+}
 
 
 //func for genarating unqiue filename
@@ -37,16 +58,17 @@ vector2 randomGradient(int ix, int iy){
 	const unsigned w = 8 * sizeof(unsigned);
 	const unsigned s = w / 2;
 	unsigned a = ix, b = iy;
-	a *= 3284157443;
-	//a *= randomNumGen();
+	//a *= 3284157443;
+	a *= generateRandomPrime(1000000000, 4294967295); // Use a randomly generated prime
+
 
 	b ^= a << s | a >> w - s;
-	b *= 1911520717;
-	//b *= randomNumGen();
+	//b *= 1911520717;
+	b *= generateRandomPrime(1000000000, 4294967295); 
 
 	a ^= b << s | b >> w - s;
-	a *= 2048419325;
-	//a *= randomNumGen();
+	//a *= 2048419325;
+	a *= generateRandomPrime(1000000000, 4294967295);
 
 	float random = a * (3.14159265 / ~(~0u >> 1)); //in [0, 2*Pi]
 	
@@ -119,6 +141,8 @@ int main() {
 	const int windowHeight = 1080;
 
 	const int GRID_SIZE = 400;
+
+	srand(static_cast<unsigned>(time(0))); // Seed the random number generator
 
 	//create array to store RGB (Maily Alpha) values, 4 values per pixel
 	std::vector<unsigned char> pixels(windowWidth * windowHeight * 4, 0);
