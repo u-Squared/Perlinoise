@@ -3,7 +3,7 @@ CLI based perlin noise generator
 
 
 # how to use
-call the program with or without seed
-eg; `./perlinoise` or `./perlonoise 1234`
+call the program with or without reselution and/or seed
 
-ps; seed can only be an integer 
+eg; `./perlinoise -s323215 -r1280x720`
+
