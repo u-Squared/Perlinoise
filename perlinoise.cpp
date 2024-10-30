@@ -8,6 +8,8 @@
 #include<cstdlib>
 #include<ctime>
 
+#include<unistd.h>
+
 #include<string>
 #include<fstream> // for std::ifstream
 
@@ -185,22 +187,36 @@ float perlin(float x, float y, unsigned int seed){
 
 int main(int argc, char *argv[]) {
 
-	const int windowWidth = 1920;
-	const int windowHeight = 1080;
-
+	int windowWidth = 1920; // pic will be 1920 x 1080 by default
+	int windowHeight = 1080;
 	const int GRID_SIZE = 400;
 
+	unsigned int seed = static_cast<unsigned int>(time(0)); // Default seed based on current time
 
-	unsigned int seed;
-	if (argc > 1) {
-		seed = static_cast<unsigned int>(std::stoul(argv[1])); // Use the seed from command line
-	} else {
-		seed = static_cast<unsigned int>(time(0)); // Default seed based on current time
+
+
+	int opt;
+	while ((opt = getopt(argc, argv, "r:s:")) != -1) {
+		switch (opt) {
+			case 'r':  // Resolution argument
+			if (sscanf(optarg, "%dx%d", &windowWidth, &windowHeight) != 2) {
+				std::cerr << "Invalid format for resolution. Use -rWIDTHxHEIGHT.\n";
+				return EXIT_FAILURE;
+			} break;
+			
+			case 's':  // Seed argument
+				seed = static_cast<unsigned int>(std::stoul(optarg));
+				break;
+			
+			default:
+				std::cerr << "Usage: " << argv[0] << " [-r WIDTHxHEIGHT] [-s SEED]\n";
+				return EXIT_FAILURE;
+		}
 	}
-	srand(seed); // Seed the random number generator for randomPerlinValue() if used elsewhere
-
+	
+	srand(seed);  // Seed the random number generator
 	std::cout << "Using seed: " << seed << std::endl;
-
+	std::cout << "Resolution: " << windowWidth << "x" << windowHeight << std::endl;
 
 	//create array to store RGB (Maily Alpha) values, 4 values per pixel
 	std::vector<unsigned char> pixels(windowWidth * windowHeight * 4, 0);
